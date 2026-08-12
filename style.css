@@ -53,3 +53,4 @@ body, html {
 .slide.to-down    { transform: translate(0, 100%);  z-index: 1; }
 .slide.to-left    { transform: translate(-100%, 0); z-index: 1; }
 .slide.to-right   { transform: translate(100%, 0);  z-index: 1; }
+

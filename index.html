@@ -1,9 +1,8 @@
-<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>여름전</title>
+    <title>익숙한 향기</title>
     <link rel="stylesheet" type="text/css" href="style.css" />
 </head>
 <body>
@@ -51,6 +50,8 @@
         const SENSITIVITY_THRESHOLD = 600; 
 
         activeBg.style.backgroundImage = `url('${images[imageIndex]}')`;
+        nextBg.style.backgroundImage = `url('${images[(imageIndex + 1) % images.length]}')`;
+
 
         function slideToDirection(dir) {
             isTransitioning = true;
@@ -91,6 +92,10 @@
             const tempBg = activeBg;
             activeBg = nextBg;
             nextBg = tempBg;
+
+            imageIndex = (imageIndex + 1) % images.length;
+            const upcomingIndex = (imageIndex + 1) % images.length;
+            nextBg.style.backgroundImage = `url('${images[upcomingIndex]}')`;
 
             setTimeout(() => {
                 isTransitioning = false;
