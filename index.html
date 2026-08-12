@@ -93,13 +93,14 @@
             activeBg = nextBg;
             nextBg = tempBg;
 
+            setTimeout(() => {
             imageIndex = (imageIndex + 1) % images.length;
+                
             const upcomingIndex = (imageIndex + 1) % images.length;
             nextBg.style.backgroundImage = `url('${images[upcomingIndex]}')`;
 
-            setTimeout(() => {
-                isTransitioning = false;
-            }, 500);
+            isTransitioning = false;
+            }, 750); 
         }
 
         window.addEventListener('wheel', (e) => {
