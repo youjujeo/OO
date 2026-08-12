@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>여름전</title>
+    <link rel="stylesheet" type="text/css" href="style.css" />
+</head>
+<body>
+
+    <div class="stage" id="stage">
+        <div class="slide current" id="layerA"><div class="mask-container" id="bgA"></div></div>
+        <div class="slide" id="layerB"><div class="mask-container" id="bgB"></div></div>
+    </div>
+
+    <script>
+        const images = [
+            'i/1.png',
+            'i/2.png',
+            'i/3.png',
+            'i/4.png',
+            'i/5.png',
+            'i/6.png',
+            'i/7.png',
+            'i/8.png',
+            'i/9.png',
+            'i/10.png'
+        ];
+
+        const preloadedImages = [];
+        function preloadImages() {
+            for (let i = 0; i < images.length; i++) {
+                preloadedImages[i] = new Image();
+                preloadedImages[i].src = images[i];
+            }
+        }
+        preloadImages();
+
+        let activeLayer = document.getElementById('layerA');
+        let nextLayer = document.getElementById('layerB');
+        let activeBg = document.getElementById('bgA');
+        let nextBg = document.getElementById('bgB');
+
+        let imageIndex = 0; 
+        
+        let accumulatedDeltaX = 0;
+        let accumulatedDeltaY = 0;
+        let isTransitioning = false; 
+        
+        //감도
+        const SENSITIVITY_THRESHOLD = 600; 
+
+        activeBg.style.backgroundImage = `url('${images[imageIndex]}')`;
+
+        function slideToDirection(dir) {
+            isTransitioning = true;
+            imageIndex = (imageIndex + 1) % images.length;
+            
+            nextBg.style.backgroundImage = `url('${images[imageIndex]}')`;
+            nextLayer.style.transition = 'none';
+
+            let fromClass = '', toClass = '';
+
+            if (dir === 'down') {
+                fromClass = 'from-down';
+                toClass = 'to-up';
+            } else if (dir === 'up') {
+                fromClass = 'from-up';
+                toClass = 'to-down';
+            } else if (dir === 'right') {
+                fromClass = 'from-right';
+                toClass = 'to-left';
+            } else if (dir === 'left') {
+                fromClass = 'from-left';
+                toClass = 'to-right';
+            }
+
+            nextLayer.className = `slide ${fromClass}`;
+            void nextLayer.offsetWidth;
+
+            nextLayer.style.transition = 'transform 0.75s cubic-bezier(0.25, 1, 0.35, 1)';
+            activeLayer.style.transition = 'transform 0.75s cubic-bezier(0.25, 1, 0.35, 1)';
+
+            nextLayer.className = 'slide current';
+            activeLayer.className = `slide ${toClass}`;
+
+            const tempLayer = activeLayer;
+            activeLayer = nextLayer;
+            nextLayer = tempLayer;
+
+            const tempBg = activeBg;
+            activeBg = nextBg;
+            nextBg = tempBg;
+
+            setTimeout(() => {
+                isTransitioning = false;
+            }, 500);
+        }
+
+        window.addEventListener('wheel', (e) => {
+            if (isTransitioning) return;
+
+            accumulatedDeltaX += e.deltaX;
+            accumulatedDeltaY += e.deltaY;
+
+            const absX = Math.abs(accumulatedDeltaX);
+            const absY = Math.abs(accumulatedDeltaY);
+
+            if (absY >= SENSITIVITY_THRESHOLD || absX >= SENSITIVITY_THRESHOLD) {
+                let direction = '';
+                
+                if (absY >= absX) {
+                    direction = accumulatedDeltaY > 0 ? 'down' : 'up';
+                } else {
+                    direction = accumulatedDeltaX > 0 ? 'right' : 'left';
+                }
+
+                slideToDirection(direction);
+                
+                accumulatedDeltaX = 0;
+                accumulatedDeltaY = 0;
+            }
+
+            clearTimeout(window.scrollDecayTimeout);
+            window.scrollDecayTimeout = setTimeout(() => {
+                accumulatedDeltaX = 0;
+                accumulatedDeltaY = 0;
+            }, 100);
+        });
+        
+    </script>
+</body>
+</html>
